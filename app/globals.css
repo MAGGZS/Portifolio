@@ -1,0 +1,261 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Paleta: preto / cinza escuro / vermelho ---- */
+  --color-ink-950: #050505;
+  --color-ink-900: #0a0a0b;
+  --color-ink-850: #0f0f11;
+  --color-ink-800: #141416;
+  --color-ink-700: #1c1c1f;
+  --color-ink-600: #2a2a2e;
+  --color-ink-500: #3a3a40;
+  --color-ash-400: #6b6b73;
+  --color-ash-300: #9a9aa3;
+  --color-ash-200: #c8c8ce;
+  --color-bone: #f2f0ee;
+
+  --color-blood-700: #7a0c12;
+  --color-blood-600: #a5121a;
+  --color-blood-500: #d11f27;
+  --color-blood-400: #e63946;
+  --color-blood-300: #ff5a63;
+
+  --font-display: var(--font-anton), "Archivo Black", Impact, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+
+  /* ---- Curvas (fortes, estilo AE) ---- */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+:root {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+  color-scheme: dark;
+}
+
+* {
+  min-width: 0;
+}
+
+html {
+  background: var(--color-ink-950);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink-950);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-blood-500);
+  color: #fff;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink-900);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink-600);
+  border-radius: 999px;
+  border: 3px solid var(--color-ink-900);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-blood-600);
+}
+
+/* ---- Grão de filme: camada global, barata, fora do main thread ---- */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  opacity: 0.16;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: grain-shift 7s steps(8) infinite;
+}
+
+@keyframes grain-shift {
+  0%   { transform: translate3d(0, 0, 0); }
+  12%  { transform: translate3d(-2%, -3%, 0); }
+  25%  { transform: translate3d(3%, -2%, 0); }
+  37%  { transform: translate3d(-3%, 2%, 0); }
+  50%  { transform: translate3d(2%, 3%, 0); }
+  62%  { transform: translate3d(-2%, 1%, 0); }
+  75%  { transform: translate3d(3%, -1%, 0); }
+  87%  { transform: translate3d(-1%, -2%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* ---- Scanlines suaves ---- */
+.scanlines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.025) 0px,
+    rgba(255, 255, 255, 0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.5;
+}
+
+/* ---- Marquee: CSS puro, roda fora do main thread ---- */
+@keyframes marquee-x {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee-x var(--marquee-duration, 40s) linear infinite;
+}
+
+.marquee-track[data-direction="right"] {
+  animation-direction: reverse;
+}
+
+.marquee-host:hover .marquee-track[data-pause-on-hover="true"] {
+  animation-play-state: paused;
+}
+
+/* ---- Máscara de reveal de texto ---- */
+.mask-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+/* ---- Foco visível ---- */
+:where(a, button, input, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-blood-500);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---- Utilitários ---- */
+.text-balance { text-wrap: balance; }
+.text-stroke {
+  -webkit-text-stroke: 1px var(--color-ink-500);
+  color: transparent;
+}
+
+.edge-fade {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* ---- ShinyText (ref.: React Bits) ---- */
+.shiny-text {
+  background: linear-gradient(
+    110deg,
+    var(--color-ash-400) 0%,
+    var(--color-ash-400) 38%,
+    var(--color-bone) 50%,
+    var(--color-ash-400) 62%,
+    var(--color-ash-400) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine var(--shine-duration, 4.5s) linear infinite;
+}
+
+.shiny-text--off {
+  animation: none;
+  color: var(--color-ash-300);
+}
+
+@keyframes shine {
+  from { background-position: 180% 0; }
+  to   { background-position: -80% 0; }
+}
+
+/* ---- GlitchText (ref.: React Bits) ---- */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+}
+
+.glitch::before {
+  color: var(--color-blood-500);
+  clip-path: inset(0 0 58% 0);
+}
+
+.glitch::after {
+  color: #35d6e0;
+  clip-path: inset(56% 0 0 0);
+}
+
+.glitch:hover::before,
+.glitch--always::before {
+  opacity: 0.85;
+  animation: glitch-a 1.6s steps(3) infinite;
+}
+
+.glitch:hover::after,
+.glitch--always::after {
+  opacity: 0.7;
+  animation: glitch-b 1.9s steps(3) infinite;
+}
+
+@keyframes glitch-a {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20%      { transform: translate3d(-2px, -1px, 0); }
+  40%      { transform: translate3d(3px, 1px, 0); }
+  60%      { transform: translate3d(-1px, 2px, 0); }
+  80%      { transform: translate3d(2px, -2px, 0); }
+}
+
+@keyframes glitch-b {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25%      { transform: translate3d(2px, 1px, 0); }
+  50%      { transform: translate3d(-3px, -1px, 0); }
+  75%      { transform: translate3d(1px, -2px, 0); }
+}
+
+/* ---- Movimento reduzido: mantém opacidade/cor, corta deslocamento ---- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .marquee-track {
+    animation-duration: 240s;
+  }
+  .grain::after {
+    animation: none;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
